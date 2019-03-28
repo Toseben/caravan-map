@@ -1,20 +1,30 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, { Component } from "react";
+import { Map, Marker, Popup, TileLayer } from "react-leaflet";
+import Parking from "./Parking";
 
-import './App.css';
+// import './App.css';
 
 class App extends Component {
   render() {
+    const radius = 1000;
+    const position = [62.60109, 29.76353];
+    const style = {
+      width: "100vw",
+      height: "100vh"
+    };
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+      <Map center={position} minZoom={3} maxZoom={19} zoom={14} style={style}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <Marker position={position}>
+          <Popup>
+            A pretty CSS3 popup.
+            <br />
+            Easily customizable.
+          </Popup>
+        </Marker>
+        <Parking center={position} radius={radius} />
+      </Map>
     );
   }
 }
