@@ -14,12 +14,14 @@
   "license": "MIT",
   "dependencies": {
     "@derhuerst/query-overpass": "^1.0.1",
+    "esri-leaflet-geocoder": "^2.2.14",
     "leaflet": "^1.4.0",
     "overpass-frontend": "^2.4.2",
     "query-overpass": "^1.5.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-leaflet": "^2.2.1"
+    "react-leaflet": "^2.2.1",
+    "react-leaflet-control": "^2.1.1"
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.3"

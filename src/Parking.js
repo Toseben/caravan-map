@@ -11,6 +11,16 @@ export default class Castles extends React.Component {
   }
 
   componentDidMount() {
+    this.updateParkingLocations();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.center !== this.props.center) {
+      this.updateParkingLocations();
+    }
+  }
+
+  updateParkingLocations() {
     const { center, radius } = this.props;
 
     const query = `[out:json];
@@ -21,9 +31,7 @@ export default class Castles extends React.Component {
     );\
     out body;>;out skel qt;`;
 
-    const options = {
-      flatProperties: true
-    };
+    const options = { flatProperties: true };
 
     query_overpass(query, this.dataHandler.bind(this), options);
   }
@@ -31,12 +39,10 @@ export default class Castles extends React.Component {
   dataHandler(error, osmData) {
     if (!error && osmData.features !== undefined) {
       this.setState({ geojson: osmData });
-
-      console.log(osmData)
     }
   }
 
   render() {
-    return this.state.geojson ? <GeoJSON data={this.state.geojson} /> : null;
+    return this.state.geojson ? <GeoJSON key={Math.random()} data={this.state.geojson} /> : null;
   }
 }
