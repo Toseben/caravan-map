@@ -6,7 +6,7 @@ import Parking from "./Parking";
 
 import Control from "react-leaflet-control";
 
-import "./App.css";
+import "./App.scss";
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -19,7 +19,11 @@ L.Icon.Default.mergeOptions({
 class App extends Component {
   constructor() {
     super();
-    this.state = { position: [62.60109, 29.76353] };
+    this.state = {
+      position: [62.60109, 29.76353],
+      radius: 250,
+      zoom: 14
+    };
   }
 
   componentDidMount() {
@@ -27,9 +31,14 @@ class App extends Component {
     const map = this.leafletMap.leafletElement;
     const searchControl = new ELG.Geosearch().addTo(map);
     const results = new L.LayerGroup().addTo(map);
-
-    searchControl.on("results", function(data) {
+    
+    const overlay = document.querySelector('.loading-overlay')
+    searchControl.on("results", data => {
       results.clearLayers();
+
+      // console.log(data.results);
+      overlay.style.opacity = 1;
+
       for (let i = data.results.length - 1; i >= 0; i--) {
         results.addLayer(L.marker(data.results[i].latlng));
 
@@ -42,42 +51,46 @@ class App extends Component {
   }
 
   render() {
-    const { position } = this.state;
-    const radius = 1000;
+    const { position, radius, zoom } = this.state;
     const style = {
       width: "100vw",
       height: "100vh"
     };
 
     return (
-      <Map
-        center={position}
-        zoomControl={false}
-        minZoom={3}
-        maxZoom={19}
-        zoom={14}
-        style={style}
-        ref={m => {
-          this.leafletMap = m;
-        }}
-      >
-        <ZoomControl position="topright" />
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <Marker position={position}>
+      <div>
+        <div className="loading-overlay">
+          <p>Loading Results...</p>
+        </div>
+        <Map
+          center={position}
+          zoomControl={false}
+          minZoom={3}
+          maxZoom={19}
+          zoom={zoom}
+          style={style}
+          ref={m => {
+            this.leafletMap = m;
+          }}
+        >
+          <ZoomControl position="topright" />
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {/* <Marker position={position}>
           <Popup>
             A pretty CSS3 popup.
             <br />
             Easily customizable.
           </Popup>
-        </Marker>
-        <Parking center={position} radius={radius} />
+        </Marker> */}
+          <Parking center={position} radius={radius} />
 
-        {/* <Control position="topleft">
+          {/* <Control position="topleft">
           <button onClick={() => this.setState({ position: [62.60109 + Math.random() * 0.025, 29.76353] })}>
             Reset Position
           </button>
         </Control> */}
-      </Map>
+        </Map>
+      </div>
     );
   }
 }
