@@ -6,6 +6,11 @@ import Parking from "./Parking";
 
 import Control from "react-leaflet-control";
 
+import "rc-slider/assets/index.css";
+import "rc-tooltip/assets/bootstrap.css";
+import Tooltip from "rc-tooltip";
+import Slider from "rc-slider";
+
 import "./App.scss";
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -16,12 +21,34 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-shadow.png"
 });
 
+const createSliderWithTooltip = Slider.createSliderWithTooltip;
+const Handle = Slider.Handle;
+
+const handle = props => {
+  const { value, dragging, index, ...restProps } = props;
+  return (
+    <Tooltip prefixCls="rc-slider-tooltip" overlay={`${value} km`} visible={dragging} placement="top" key={index}>
+      <Handle value={value} {...restProps} />
+    </Tooltip>
+  );
+};
+
+const wrapperStyle = {
+  borderRadius: 2,
+  width: 200,
+  margin: 12,
+  padding: 20,
+  position: "absolute",
+  zIndex: 100000,
+  background: "white"
+};
+
 class App extends Component {
   constructor() {
     super();
     this.state = {
       position: [62.60109, 29.76353],
-      radius: 250,
+      radius: 1000,
       zoom: 14
     };
   }
@@ -31,13 +58,13 @@ class App extends Component {
     const map = this.leafletMap.leafletElement;
     const searchControl = new ELG.Geosearch().addTo(map);
     const results = new L.LayerGroup().addTo(map);
-    
-    const overlay = document.querySelector('.loading-overlay')
+
+    this.overlay = document.querySelector(".loading-overlay");
     searchControl.on("results", data => {
       results.clearLayers();
 
       // console.log(data.results);
-      overlay.style.opacity = 1;
+      _this.overlay.style.opacity = 1;
 
       for (let i = data.results.length - 1; i >= 0; i--) {
         results.addLayer(L.marker(data.results[i].latlng));
@@ -48,6 +75,11 @@ class App extends Component {
         });
       }
     });
+  }
+
+  sliderUpdate(evt) {
+    this.setState({ radius: evt * 1000 });
+    this.overlay.style.opacity = 1;
   }
 
   render() {
@@ -61,6 +93,10 @@ class App extends Component {
       <div>
         <div className="loading-overlay">
           <p>Loading Results...</p>
+        </div>
+        <div style={wrapperStyle}>
+          <p>Radius Slider</p>
+          <Slider min={1} max={10} defaultValue={1} handle={handle} onAfterChange={this.sliderUpdate.bind(this)} />
         </div>
         <Map
           center={position}

@@ -21,9 +21,11 @@ export default class Castles extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.center !== this.props.center) {
-      this.updateParkingLocations();
-    }
+    let shouldUpdate = false;
+
+    if (prevProps.center !== this.props.center) shouldUpdate = true;
+    if (prevProps.radius !== this.props.radius) shouldUpdate = true;
+    if (shouldUpdate) this.updateParkingLocations();
   }
 
   updateParkingLocations() {
