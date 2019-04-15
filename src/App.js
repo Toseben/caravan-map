@@ -43,6 +43,16 @@ const wrapperStyle = {
   background: "white"
 };
 
+// var osm = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"),
+//   mqi = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png", {
+//     subdomains: ["otile1", "otile2", "otile3", "otile4"]
+//   });
+
+// var baseMaps = {
+//   OpenStreetMap: osm,
+//   MapQuestImagery: mqi
+// };
+
 class App extends Component {
   constructor() {
     super();
@@ -58,6 +68,50 @@ class App extends Component {
     const map = this.leafletMap.leafletElement;
     const searchControl = new ELG.Geosearch().addTo(map);
     const results = new L.LayerGroup().addTo(map);
+
+    var osm = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+    var googleStreets = L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+      maxZoom: 20,
+      subdomains: ["mt0", "mt1", "mt2", "mt3"]
+    });
+
+    var googleHybrid = L.tileLayer("http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}", {
+      maxZoom: 20,
+      subdomains: ["mt0", "mt1", "mt2", "mt3"]
+    });
+
+    var googleSat = L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
+      maxZoom: 20,
+      subdomains: ["mt0", "mt1", "mt2", "mt3"]
+    });
+
+    var googleTerrain = L.tileLayer("http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}", {
+      maxZoom: 20,
+      subdomains: ["mt0", "mt1", "mt2", "mt3"]
+    });
+
+    var mapbox = L.tileLayer(
+      "https://api.mapbox.com/styles/v1/koskela/cjtrsbnea19oi1fml31vhshyz/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia29za2VsYSIsImEiOiJjam8xdGdrcG8wZHp4M3FueG1nbmkwM3F5In0.kW7JMFvLZS1KPALMcjGa0Q",
+      {
+        maxZoom: 20,
+        subdomains: ["mt0", "mt1", "mt2", "mt3"]
+      }
+    ).addTo(map);
+
+    var baseMaps = {
+      // OpenStreetMap: osm,
+      // googleStreets: googleStreets,
+      // googleHybrid: googleHybrid,
+      Satellite: googleSat,
+      // googleTerrain: googleTerrain,
+      Styled: mapbox
+    };
+
+    var overlays = {
+      //add any overlays here
+    };
+
+    L.control.layers(baseMaps, overlays, { position: "topleft" }).addTo(map);
 
     this.overlay = document.querySelector(".loading-overlay");
     searchControl.on("results", data => {
@@ -110,7 +164,7 @@ class App extends Component {
           }}
         >
           <ZoomControl position="topright" />
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {/* <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /> */}
           {/* <Marker position={position}>
           <Popup>
             A pretty CSS3 popup.
