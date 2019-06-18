@@ -5,6 +5,7 @@ import { Map, Marker, Popup, TileLayer, ZoomControl } from "react-leaflet";
 import Parking from "./Parking";
 
 import Control from "react-leaflet-control";
+import 'leaflet.locatecontrol'
 
 import "rc-slider/assets/index.css";
 import "rc-tooltip/assets/bootstrap.css";
@@ -55,48 +56,61 @@ const wrapperStyle = {
 
 class App extends Component {
   constructor() {
-    super();
+    super()
     this.state = {
       position: [62.60109, 29.76353],
       radius: 1000,
       zoom: 14
-    };
+    }
+  }
+
+  onLocationFound(e) {
+    this.setState({
+      position: [e.latlng.lat, e.latlng.lng]
+    })
   }
 
   componentDidMount() {
-    const _this = this;
-    const map = this.leafletMap.leafletElement;
-    const searchControl = new ELG.Geosearch().addTo(map);
-    const results = new L.LayerGroup().addTo(map);
+    const _this = this
+    const map = this.leafletMap.leafletElement
+    const searchControl = new ELG.Geosearch().addTo(map)
+    const results = new L.LayerGroup().addTo(map)
 
-    var osm = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-    var googleStreets = L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
-      maxZoom: 20,
-      subdomains: ["mt0", "mt1", "mt2", "mt3"]
-    });
+    const options = { position: 'bottomleft', keepCurrentZoomLevel: true, drawCircle: false }
+    L.control.locate(options).addTo(map)
+    map.on('locationfound', this.onLocationFound.bind(this))
 
-    var googleHybrid = L.tileLayer("http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}", {
-      maxZoom: 20,
-      subdomains: ["mt0", "mt1", "mt2", "mt3"]
-    });
+    // map.locate({ setView: true })
+    // const coords = map.getBounds().getCenter()
 
-    var googleSat = L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
+    var osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+    var googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       maxZoom: 20,
-      subdomains: ["mt0", "mt1", "mt2", "mt3"]
-    });
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    })
 
-    var googleTerrain = L.tileLayer("http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}", {
+    var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
       maxZoom: 20,
-      subdomains: ["mt0", "mt1", "mt2", "mt3"]
-    });
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    })
+
+    var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    })
+
+    var googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    })
 
     var mapbox = L.tileLayer(
-      "https://api.mapbox.com/styles/v1/koskela/cjtrsbnea19oi1fml31vhshyz/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia29za2VsYSIsImEiOiJjam8xdGdrcG8wZHp4M3FueG1nbmkwM3F5In0.kW7JMFvLZS1KPALMcjGa0Q",
+      'https://api.mapbox.com/styles/v1/koskela/cjtrsbnea19oi1fml31vhshyz/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia29za2VsYSIsImEiOiJjam8xdGdrcG8wZHp4M3FueG1nbmkwM3F5In0.kW7JMFvLZS1KPALMcjGa0Q',
       {
         maxZoom: 20,
-        subdomains: ["mt0", "mt1", "mt2", "mt3"]
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
       }
-    ).addTo(map);
+    ).addTo(map)
 
     var baseMaps = {
       // OpenStreetMap: osm,
@@ -105,43 +119,43 @@ class App extends Component {
       Satellite: googleSat,
       // googleTerrain: googleTerrain,
       Styled: mapbox
-    };
+    }
 
     var overlays = {
       //add any overlays here
-    };
+    }
 
-    L.control.layers(baseMaps, overlays, { position: "topleft" }).addTo(map);
+    L.control.layers(baseMaps, overlays, { position: 'topleft' }).addTo(map)
 
-    this.overlay = document.querySelector(".loading-overlay");
-    searchControl.on("results", data => {
-      results.clearLayers();
+    this.overlay = document.querySelector('.loading-overlay')
+    searchControl.on('results', data => {
+      results.clearLayers()
 
       // console.log(data.results);
-      _this.overlay.style.opacity = 1;
+      _this.overlay.style.opacity = 1
 
       for (let i = data.results.length - 1; i >= 0; i--) {
-        results.addLayer(L.marker(data.results[i].latlng));
+        results.addLayer(L.marker(data.results[i].latlng))
 
-        const coords = data.results[i].latlng;
+        const coords = data.results[i].latlng
         _this.setState({
           position: [coords.lat, coords.lng]
-        });
+        })
       }
-    });
+    })
   }
 
   sliderUpdate(evt) {
-    this.setState({ radius: evt * 1000 });
-    this.overlay.style.opacity = 1;
+    this.setState({ radius: evt * 1000 })
+    this.overlay.style.opacity = 1
   }
 
   render() {
-    const { position, radius, zoom } = this.state;
+    const { position, radius, zoom } = this.state
     const style = {
-      width: "100vw",
-      height: "100vh"
-    };
+      width: '100vw',
+      height: '100vh'
+    }
 
     return (
       <div>
@@ -160,7 +174,7 @@ class App extends Component {
           zoom={zoom}
           style={style}
           ref={m => {
-            this.leafletMap = m;
+            this.leafletMap = m
           }}
         >
           <ZoomControl position="topright" />
@@ -181,7 +195,7 @@ class App extends Component {
         </Control> */}
         </Map>
       </div>
-    );
+    )
   }
 }
 
