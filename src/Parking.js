@@ -39,7 +39,7 @@ export default class Castles extends React.Component {
     );\
     out body;>;out skel qt;`;
 
-    const options = { flatProperties: true };
+    const options = { flatProperties: true, overpassUrl: 'https://overpass-api.de/api/interpreter' }
 
     query_overpass(query, this.dataHandler.bind(this), options);
   }
