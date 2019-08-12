@@ -1,4 +1,6 @@
-import React, { Component } from "react";
+const React = require('react')
+const { useRef, useState, useEffect } = React
+
 import L from "leaflet";
 import * as ELG from "esri-leaflet-geocoder";
 import { Map, Marker, Popup, TileLayer, ZoomControl } from "react-leaflet";
@@ -54,31 +56,35 @@ const wrapperStyle = {
 //   MapQuestImagery: mqi
 // };
 
-class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      position: [62.60109, 29.76353],
-      radius: 1000,
-      zoom: 14
-    }
+const App = () => {
+  const leafletMap = useRef()
+  const overlay = useRef()
+
+  const [position, setPosition] = useState([62.60109, 29.76353])
+  const [radius, setRadius] = useState(1000)
+  const [zoom, setZoom] = useState(14)
+
+  useEffect(() => {
+    overlay.current = document.querySelector('.loading-overlay')
+  }, [])
+
+  const style = {
+    width: '100vw',
+    height: '100vh'
   }
 
-  onLocationFound(e) {
-    this.setState({
-      position: [e.latlng.lat, e.latlng.lng]
-    })
+  const onLocationFound = e => {
+    setPosition([e.latlng.lat, e.latlng.lng])
   }
 
-  componentDidMount() {
-    const _this = this
-    const map = this.leafletMap.leafletElement
+  useEffect(() => {
+    const map = leafletMap.current.leafletElement
     const searchControl = new ELG.Geosearch().addTo(map)
     const results = new L.LayerGroup().addTo(map)
 
     const options = { position: 'bottomleft', keepCurrentZoomLevel: true, drawCircle: false }
     // L.control.locate(options).addTo(map)
-    map.on('locationfound', this.onLocationFound.bind(this))
+    map.on('locationfound', onLocationFound.bind(this))
 
     // map.locate({ setView: true })
     // const coords = map.getBounds().getCenter()
@@ -127,76 +133,55 @@ class App extends Component {
 
     L.control.layers(baseMaps, overlays, { position: 'topleft' }).addTo(map)
 
-    this.overlay = document.querySelector('.loading-overlay')
     searchControl.on('results', data => {
       results.clearLayers()
 
       // console.log(data.results);
-      _this.overlay.style.opacity = 1
+      overlay.current.style.opacity = 1
 
       for (let i = data.results.length - 1; i >= 0; i--) {
         results.addLayer(L.marker(data.results[i].latlng))
 
         const coords = data.results[i].latlng
-        _this.setState({
-          position: [coords.lat, coords.lng]
-        })
+        setPosition([coords.lat, coords.lng])
       }
     })
+  }, [])
+
+  const sliderUpdate = evt => {
+    setRadius(evt * 1000)
+    overlay.current.style.opacity = 1
   }
 
-  sliderUpdate(evt) {
-    this.setState({ radius: evt * 1000 })
-    this.overlay.style.opacity = 1
-  }
-
-  render() {
-    const { position, radius, zoom } = this.state
-    const style = {
-      width: '100vw',
-      height: '100vh'
-    }
-
-    return (
-      <div>
-        <div className="loading-overlay">
-          <p>Loading Results...</p>
-        </div>
-        <div style={wrapperStyle}>
-          <p>Radius Slider</p>
-          <Slider min={1} max={10} defaultValue={1} handle={handle} onAfterChange={this.sliderUpdate.bind(this)} />
-        </div>
-        <Map
-          center={position}
-          zoomControl={false}
-          minZoom={3}
-          maxZoom={19}
-          zoom={zoom}
-          style={style}
-          ref={m => {
-            this.leafletMap = m
-          }}
-        >
-          <ZoomControl position="topright" />
-          {/* <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /> */}
-          {/* <Marker position={position}>
+  return (
+    <div>
+      <div className="loading-overlay">
+        <p>Loading Results...</p>
+      </div>
+      <div style={wrapperStyle}>
+        <p>Radius Slider</p>
+        <Slider min={1} max={10} defaultValue={1} handle={handle} onAfterChange={sliderUpdate.bind(this)} />
+      </div>
+      <Map center={position} zoomControl={false} minZoom={3} maxZoom={19} zoom={zoom} style={style} ref={leafletMap}>
+        <ZoomControl position="topright" />
+        {/* <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /> */}
+        {/* <Marker position={position}>
           <Popup>
             A pretty CSS3 popup.
             <br />
             Easily customizable.
           </Popup>
         </Marker> */}
-          <Parking center={position} radius={radius} />
+        <Parking center={position} radius={radius} />
 
-          {/* <Control position="topleft">
+        {/* <Control position="topleft">
           <button onClick={() => this.setState({ position: [62.60109 + Math.random() * 0.025, 29.76353] })}>
             Reset Position
           </button>
         </Control> */}
-        </Map>
-      </div>
-    )
-  }
+      </Map>
+    </div>
+  )
 }
 
-export default App;
+module.exports = App
