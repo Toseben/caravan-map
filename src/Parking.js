@@ -1,5 +1,6 @@
-import React from "react";
-import { GeoJSON, Marker } from "react-leaflet";
+const React = require('react')
+const { useRef, useState, useEffect, useMemo } = React
+import { GeoJSON } from "react-leaflet";
 const query_overpass = require("query-overpass");
 
 const capitalize = s => {
@@ -7,29 +8,29 @@ const capitalize = s => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-export default class Castles extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      geojson: undefined
-    };
-  }
+const Parking = ({ ...props }) => {
+  const [geojson, setGeojson] = useState(undefined)
+  const prevState = useRef()
 
-  componentDidMount() {
-    this.updateParkingLocations();
-    this.overlay = document.querySelector(".loading-overlay");
-  }
+  const overlay = useMemo(() => {
+    return document.querySelector('.loading-overlay')
+  }, [])
 
-  componentDidUpdate(prevProps) {
+  useEffect(() => {
+    updateParkingLocations()
+    prevState.current = props
+  }, [])
+
+  useEffect(() => {
     let shouldUpdate = false;
+    if (prevState.current.center !== props.center) shouldUpdate = true
+    if (prevState.current.radius !== props.radius) shouldUpdate = true
+    if (shouldUpdate) updateParkingLocations();
+    prevState.current = props
+  }, [props])
 
-    if (prevProps.center !== this.props.center) shouldUpdate = true;
-    if (prevProps.radius !== this.props.radius) shouldUpdate = true;
-    if (shouldUpdate) this.updateParkingLocations();
-  }
-
-  updateParkingLocations() {
-    const { center, radius } = this.props;
+  const updateParkingLocations = () => {
+    const { center, radius } = props;
 
     const query = `[out:json];
     (
@@ -41,17 +42,17 @@ export default class Castles extends React.Component {
 
     const options = { flatProperties: true, overpassUrl: 'https://overpass-api.de/api/interpreter' }
 
-    query_overpass(query, this.dataHandler.bind(this), options);
+    query_overpass(query, dataHandler.bind(this), options);
   }
 
-  dataHandler(error, osmData) {
+  const dataHandler = (error, osmData) => {
     if (!error && osmData.features !== undefined) {
-      this.overlay.style.opacity = 0;
-      this.setState({ geojson: osmData });
+      overlay.style.opacity = 0;
+      setGeojson(osmData)
     }
   }
 
-  onEachFeature(feature, layer) {
+  const onEachFeature = (feature, layer) => {
     const keys = Object.keys(feature.properties);
     const values = Object.values(feature.properties);
 
@@ -74,16 +75,16 @@ export default class Castles extends React.Component {
     }
   }
 
-  render() {
-    return this.state.geojson ? (
-      <GeoJSON
-        key={Math.random()}
-        data={this.state.geojson}
-        weight={2}
-        color="red"
-        fillColor="red"
-        onEachFeature={this.onEachFeature}
-      />
-    ) : null;
-  }
+  return geojson ? (
+    <GeoJSON
+      key={Math.random()}
+      data={geojson}
+      weight={2}
+      color="red"
+      fillColor="red"
+      onEachFeature={onEachFeature}
+    />
+  ) : null
 }
+
+module.exports = Parking
