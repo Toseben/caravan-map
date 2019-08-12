@@ -1,50 +1,50 @@
 const React = require('react')
 const { useRef, useState, useEffect } = React
 
-import L from "leaflet";
-import * as ELG from "esri-leaflet-geocoder";
-import { Map, Marker, Popup, TileLayer, ZoomControl } from "react-leaflet";
-import Parking from "./Parking";
+const L = require('leaflet')
+import * as ELG from 'esri-leaflet-geocoder'
+const { Map, ZoomControl } = require('react-leaflet')
+const Parking = require('./Parking')
+require('leaflet.locatecontrol')
 
-import Control from "react-leaflet-control";
-import 'leaflet.locatecontrol'
+require('rc-slider/assets/index.css')
+require('rc-tooltip/assets/bootstrap.css')
+import Tooltip from 'rc-tooltip'
+import Slider from 'rc-slider'
 
-import "rc-slider/assets/index.css";
-import "rc-tooltip/assets/bootstrap.css";
-import Tooltip from "rc-tooltip";
-import Slider from "rc-slider";
+require('./App.scss')
 
-import "./App.scss";
+// import { GeoJSON } from 'react-leaflet'
+// const { GeoJSON } = require('react-leaflet')
 
-delete L.Icon.Default.prototype._getIconUrl;
+delete L.Icon.Default.prototype._getIconUrl
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-shadow.png"
-});
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-shadow.png'
+})
 
-const createSliderWithTooltip = Slider.createSliderWithTooltip;
-const Handle = Slider.Handle;
+const Handle = Slider.Handle
 
 const handle = props => {
-  const { value, dragging, index, ...restProps } = props;
+  const { value, dragging, index, ...restProps } = props
   return (
     <Tooltip prefixCls="rc-slider-tooltip" overlay={`${value} km`} visible={dragging} placement="top" key={index}>
       <Handle value={value} {...restProps} />
     </Tooltip>
-  );
-};
+  )
+}
 
 const wrapperStyle = {
   borderRadius: 2,
   width: 200,
   margin: 12,
   padding: 20,
-  position: "absolute",
+  position: 'absolute',
   zIndex: 100000,
-  background: "white"
-};
+  background: 'white'
+}
 
 // var osm = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"),
 //   mqi = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png", {
@@ -164,21 +164,7 @@ const App = () => {
       </div>
       <Map center={position} zoomControl={false} minZoom={3} maxZoom={19} zoom={zoom} style={style} ref={leafletMap}>
         <ZoomControl position="topright" />
-        {/* <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /> */}
-        {/* <Marker position={position}>
-          <Popup>
-            A pretty CSS3 popup.
-            <br />
-            Easily customizable.
-          </Popup>
-        </Marker> */}
         <Parking center={position} radius={radius} />
-
-        {/* <Control position="topleft">
-          <button onClick={() => this.setState({ position: [62.60109 + Math.random() * 0.025, 29.76353] })}>
-            Reset Position
-          </button>
-        </Control> */}
       </Map>
     </div>
   )
