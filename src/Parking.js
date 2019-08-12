@@ -17,6 +17,7 @@ const Parking = ({ ...props }) => {
   }, [])
 
   useEffect(() => {
+    overlay.style.opacity = 1
     updateParkingLocations()
     prevState.current = props
   }, [])
@@ -25,7 +26,10 @@ const Parking = ({ ...props }) => {
     let shouldUpdate = false
     if (prevState.current.center !== props.center) shouldUpdate = true
     if (prevState.current.radius !== props.radius) shouldUpdate = true
-    if (shouldUpdate) updateParkingLocations()
+    if (shouldUpdate) {
+      overlay.style.opacity = 1
+      updateParkingLocations()
+    }
     prevState.current = props
   }, [props])
 

@@ -82,8 +82,15 @@ const App = () => {
     const searchControl = new ELG.Geosearch().addTo(map)
     const results = new L.LayerGroup().addTo(map)
 
-    const options = { position: 'bottomleft', keepCurrentZoomLevel: true, drawCircle: false }
-    // L.control.locate(options).addTo(map)
+    const options = {
+      position: 'topleft',
+      keepCurrentZoomLevel: true,
+      drawCircle: false,
+      strings: {
+        title: 'Current GPS'
+      }
+    }
+    L.control.locate(options).addTo(map)
     map.on('locationfound', onLocationFound.bind(this))
 
     // map.locate({ setView: true })
@@ -150,7 +157,6 @@ const App = () => {
 
   const sliderUpdate = evt => {
     setRadius(evt * 1000)
-    overlay.current.style.opacity = 1
   }
 
   return (
