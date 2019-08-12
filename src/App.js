@@ -77,7 +77,7 @@ class App extends Component {
     const results = new L.LayerGroup().addTo(map)
 
     const options = { position: 'bottomleft', keepCurrentZoomLevel: true, drawCircle: false }
-    L.control.locate(options).addTo(map)
+    // L.control.locate(options).addTo(map)
     map.on('locationfound', this.onLocationFound.bind(this))
 
     // map.locate({ setView: true })
