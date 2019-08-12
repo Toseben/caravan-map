@@ -79,7 +79,14 @@ const Parking = ({ ...props }) => {
   }
 
   return geoJSON ? (
-    <GeoJSON key={Math.random()} data={geoJSON} weight={2} color="red" fillColor="red" onEachFeature={onEachFeature} />
+    <GeoJSON
+      key={Math.random()}
+      data={geoJSON}
+      weight={2}
+      color="#267FCA"
+      fillColor="#267FCA"
+      onEachFeature={onEachFeature}
+    />
   ) : null
 }
 

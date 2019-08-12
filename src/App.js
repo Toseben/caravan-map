@@ -59,6 +59,7 @@ const wrapperStyle = {
 const App = () => {
   const leafletMap = useRef()
   const overlay = useRef()
+  const sliderRef = useRef()
 
   const [position, setPosition] = useState([62.60109, 29.76353])
   const [radius, setRadius] = useState(1000)
@@ -74,6 +75,8 @@ const App = () => {
   }
 
   const onLocationFound = e => {
+    setRadius(1000)
+    sliderRef.current.state.value = 1
     setPosition([e.latlng.lat, e.latlng.lng])
   }
 
@@ -91,7 +94,7 @@ const App = () => {
       }
     }
     L.control.locate(options).addTo(map)
-    map.on('locationfound', onLocationFound.bind(this))
+    map.on('locationfound', onLocationFound)
 
     // map.locate({ setView: true })
     // const coords = map.getBounds().getCenter()
@@ -166,7 +169,7 @@ const App = () => {
       </div>
       <div style={wrapperStyle}>
         <p>Radius Slider</p>
-        <Slider min={1} max={10} defaultValue={1} handle={handle} onAfterChange={sliderUpdate.bind(this)} />
+        <Slider ref={sliderRef} min={1} max={10} defaultValue={1} handle={handle} onAfterChange={sliderUpdate} />
       </div>
       <Map center={position} zoomControl={false} minZoom={3} maxZoom={19} zoom={zoom} style={style} ref={leafletMap}>
         <ZoomControl position="topright" />
