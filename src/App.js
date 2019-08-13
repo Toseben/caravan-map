@@ -1,5 +1,5 @@
 const React = require('react')
-const { useRef, useState, useEffect } = React
+const { useRef, useState, useEffect, useMemo } = React
 
 const L = require('leaflet')
 import * as ELG from 'esri-leaflet-geocoder'
@@ -61,23 +61,33 @@ const App = () => {
   const overlay = useRef()
   const sliderRef = useRef()
 
-  const [position, setPosition] = useState([62.60109, 29.76353])
+  const [position, setPosition] = useState([0, 0])
   const [radius, setRadius] = useState(1000)
-  const [zoom, setZoom] = useState(14)
+  const [zoom, setZoom] = useState(2)
 
   useEffect(() => {
     overlay.current = document.querySelector('.loading-overlay')
   }, [])
 
-  const style = {
-    width: '100vw',
-    height: '100vh'
-  }
+  const { style, bounds } = useMemo(() => {
+    const style = {
+      width: '100vw',
+      height: '100vh'
+    }
+
+    const bounds = L.latLngBounds(L.latLng(-90, -180), L.latLng(90, 180))
+    return { style, bounds }
+  }, [])
 
   const onLocationFound = e => {
     setRadius(1000)
     sliderRef.current.state.value = 1
     setPosition([e.latlng.lat, e.latlng.lng])
+
+    setTimeout(() => {
+      const map = leafletMap.current.leafletElement
+      map.userData.lc.stop()
+    }, 250)
   }
 
   useEffect(() => {
@@ -87,14 +97,21 @@ const App = () => {
 
     const options = {
       position: 'topleft',
-      keepCurrentZoomLevel: true,
+      keepCurrentZoomLevel: false,
       drawCircle: false,
       strings: {
         title: 'Current GPS'
+      },
+      locateOptions: {
+        maxZoom: 15,
+        enableHighAccuracy: true
       }
     }
-    L.control.locate(options).addTo(map)
+
+    const lc = L.control.locate(options).addTo(map)
     map.on('locationfound', onLocationFound)
+    map.userData = { lc }
+    // lc.start()
 
     // map.locate({ setView: true })
     // const coords = map.getBounds().getCenter()
@@ -171,7 +188,7 @@ const App = () => {
         <p>Radius Slider</p>
         <Slider ref={sliderRef} min={1} max={10} defaultValue={1} handle={handle} onAfterChange={sliderUpdate} />
       </div>
-      <Map center={position} zoomControl={false} minZoom={3} maxZoom={19} zoom={zoom} style={style} ref={leafletMap}>
+      <Map center={position} maxBounds={bounds} zoomControl={false} minZoom={2} maxZoom={19} zoom={zoom} style={style} ref={leafletMap}>
         <ZoomControl position="topright" />
         <Parking center={position} radius={radius} />
       </Map>

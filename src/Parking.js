@@ -17,8 +17,6 @@ const Parking = ({ ...props }) => {
   }, [])
 
   useEffect(() => {
-    overlay.style.opacity = 1
-    updateParkingLocations()
     prevState.current = props
   }, [])
 
