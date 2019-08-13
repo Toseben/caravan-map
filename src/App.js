@@ -143,10 +143,10 @@ const App = () => {
     var baseMaps = {
       // OpenStreetMap: osm,
       // googleStreets: googleStreets,
-      // googleHybrid: googleHybrid,
+      Map: mapbox,
       Satellite: googleSat,
+      'Satellite + Text': googleHybrid,
       // googleTerrain: googleTerrain,
-      Styled: mapbox
     }
 
     var overlays = {
