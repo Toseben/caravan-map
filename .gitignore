@@ -2,5 +2,10 @@
 npm-debug.log
 
 .cache/
-dist/
 node_modules/
+
+dist
+dist/*
+!dist
+!dist/assets
+!dist/assets/*

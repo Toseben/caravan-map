@@ -2,6 +2,7 @@ const React = require('react')
 const { useRef, useState, useEffect, useMemo } = React
 const { GeoJSON } = require('react-leaflet')
 const query_overpass = require('query-overpass')
+const L = require('leaflet')
 
 const capitalize = s => {
   if (typeof s !== 'string') return ''
@@ -15,6 +16,22 @@ const Parking = ({ ...props }) => {
   const overlay = useMemo(() => {
     return document.querySelector('.loading-overlay')
   }, [])
+
+  const myIcon = useMemo(() => {
+    const zoom = props.map ? props.map.getZoom() : 0
+    const x = Math.max(zoom - 5, 0) * 4
+    const y = Math.max(zoom - 5, 0) * 4
+
+    const icon = L.icon({
+      iconUrl: './assets/camping-outline.png',
+      iconSize: [x, y],
+      shadowSize: [0, 0],
+      iconAnchor: [x * 0.5, y],
+      popupAnchor: [0, -x * 1.25]
+    })
+
+    return icon
+  })
 
   useEffect(() => {
     prevState.current = props
@@ -76,6 +93,10 @@ const Parking = ({ ...props }) => {
     }
   }
 
+  const campingMarker = (geoJsonPoint, latlng) => {
+    return L.marker(latlng, { icon: myIcon })
+  }
+
   return geoJSON ? (
     <GeoJSON
       key={Math.random()}
@@ -84,6 +105,7 @@ const Parking = ({ ...props }) => {
       color="#267FCA"
       fillColor="#267FCA"
       onEachFeature={onEachFeature}
+      pointToLayer={campingMarker}
     />
   ) : null
 }

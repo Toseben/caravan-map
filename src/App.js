@@ -11,22 +11,11 @@ require('rc-slider/assets/index.css')
 require('rc-tooltip/assets/bootstrap.css')
 import Tooltip from 'rc-tooltip'
 import Slider from 'rc-slider'
-
 require('./App.scss')
 
-// import { GeoJSON } from 'react-leaflet'
-// const { GeoJSON } = require('react-leaflet')
-
-delete L.Icon.Default.prototype._getIconUrl
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-shadow.png'
-})
+const { setIconSize } = require('./utils/helperFuncs')
 
 const Handle = Slider.Handle
-
 const handle = props => {
   const { value, dragging, index, ...restProps } = props
   return (
@@ -58,6 +47,7 @@ const wrapperStyle = {
 
 const App = () => {
   const leafletMap = useRef()
+  const mapRef = useRef()
   const overlay = useRef()
   const sliderRef = useRef()
 
@@ -85,15 +75,17 @@ const App = () => {
     setPosition([e.latlng.lat, e.latlng.lng])
 
     setTimeout(() => {
-      const map = leafletMap.current.leafletElement
-      map.userData.lc.stop()
+      mapRef.current.userData.lc.stop()
     }, 250)
   }
 
   useEffect(() => {
-    const map = leafletMap.current.leafletElement
-    const searchControl = new ELG.Geosearch().addTo(map)
-    const results = new L.LayerGroup().addTo(map)
+    mapRef.current = leafletMap.current.leafletElement
+  }, [leafletMap.current])
+
+  useEffect(() => {
+    const searchControl = new ELG.Geosearch().addTo(mapRef.current)
+    const results = new L.LayerGroup().addTo(mapRef.current)
 
     const options = {
       position: 'topleft',
@@ -103,14 +95,17 @@ const App = () => {
         title: 'Current GPS'
       },
       locateOptions: {
+        minZoom: 15,
         maxZoom: 15,
         enableHighAccuracy: true
       }
     }
 
-    const lc = L.control.locate(options).addTo(map)
-    map.on('locationfound', onLocationFound)
-    map.userData = { lc }
+    mapRef.current.on('zoomend', setIconSize.bind(this)) 
+
+    const lc = L.control.locate(options).addTo(mapRef.current)
+    mapRef.current.on('locationfound', onLocationFound)
+    mapRef.current.userData = { lc }
     // lc.start()
 
     // map.locate({ setView: true })
@@ -143,7 +138,7 @@ const App = () => {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
       }
-    ).addTo(map)
+    ).addTo(mapRef.current)
 
     var baseMaps = {
       // OpenStreetMap: osm,
@@ -158,7 +153,7 @@ const App = () => {
       //add any overlays here
     }
 
-    L.control.layers(baseMaps, overlays, { position: 'topleft' }).addTo(map)
+    L.control.layers(baseMaps, overlays, { position: 'topleft' }).addTo(mapRef.current)
 
     searchControl.on('results', data => {
       results.clearLayers()
@@ -200,7 +195,7 @@ const App = () => {
         ref={leafletMap}
       >
         <ZoomControl position="topright" />
-        <Parking center={position} radius={radius} />
+        <Parking center={position} radius={radius} map={mapRef.current} />
       </Map>
     </div>
   )
