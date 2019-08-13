@@ -19,15 +19,15 @@ const Parking = ({ ...props }) => {
 
   const myIcon = useMemo(() => {
     const zoom = props.map ? props.map.getZoom() : 0
-    const x = Math.max(zoom - 5, 0) * 4
-    const y = Math.max(zoom - 5, 0) * 4
+    const x = Math.max(zoom - 12, 0) * 6
+    const y = Math.max(zoom - 12, 0) * 6
 
     const icon = L.icon({
-      iconUrl: './assets/camping-outline.png',
+      iconUrl: './assets/circle.png',
       iconSize: [x, y],
       shadowSize: [0, 0],
-      iconAnchor: [x * 0.5, y],
-      popupAnchor: [0, -x * 1.25]
+      iconAnchor: [x * 0.5, y * 0.5],
+      popupAnchor: [0, -x]
     })
 
     return icon
@@ -99,16 +99,28 @@ const Parking = ({ ...props }) => {
 
   return geoJSON ? (
     <div>
+      <Circle
+        center={{ lat: props.center[0], lng: props.center[1] }}
+        weight={1}
+        opacity={1}
+        color="#337ac7"
+        dashArray="6, 12"
+        fillColor="#337ac7"
+        fillOpacity={0.25}
+        radius={props.radius}
+      />
       <GeoJSON
         key={Math.random()}
         data={geoJSON}
-        weight={2}
-        color="#267FCA"
-        fillColor="#267FCA"
+        smoothFactor={0}
+        weight={1}
+        opacity={0.67}
+        color="#000000"
+        fillColor="#C7594C"
+        fillOpacity={0.67}
         onEachFeature={onEachFeature}
         pointToLayer={campingMarker}
       />
-      <Circle center={{ lat: props.center[0], lng: props.center[1] }} fillColor="#267FCA" radius={props.radius} />
     </div>
   ) : null
 }

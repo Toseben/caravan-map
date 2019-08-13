@@ -21,6 +21,10 @@ body {
   background-color: #f8f8f8;
 }
 
+.leaflet-container {
+  background: #D1DADC !important;
+}
+
 .pointer {
   position: absolute;
   top: 86px;
@@ -96,4 +100,19 @@ body {
     transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
     -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
   }
+}
+
+.overlay {
+  width: 100vw;
+  height: 100vh;
+  background: #D1DADC;
+  position: absolute;
+  z-index: 500;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.leaflet-marker-icon {
+  mix-blend-mode: color;
+  // filter: hue-rotate(90deg);
 }

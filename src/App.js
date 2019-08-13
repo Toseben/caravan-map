@@ -64,7 +64,7 @@ const App = () => {
       height: '100vh'
     }
 
-    const bounds = L.latLngBounds(L.latLng(-90, -180), L.latLng(90, 180))
+    const bounds = L.latLngBounds(L.latLng(-90, -180 * 3), L.latLng(90, 180 * 3))
     return { style, bounds }
   }, [])
 
@@ -145,7 +145,7 @@ const App = () => {
     })
 
     var mapbox = L.tileLayer(
-      'https://api.mapbox.com/styles/v1/koskela/cjtrsbnea19oi1fml31vhshyz/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia29za2VsYSIsImEiOiJjam8xdGdrcG8wZHp4M3FueG1nbmkwM3F5In0.kW7JMFvLZS1KPALMcjGa0Q',
+      'https://api.mapbox.com/styles/v1/koskela/cjz9s7ahj01ig1cmduhmzys0l/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia29za2VsYSIsImEiOiJjam8xdGdrcG8wZHp4M3FueG1nbmkwM3F5In0.kW7JMFvLZS1KPALMcjGa0Q',
       {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
@@ -165,7 +165,7 @@ const App = () => {
       //add any overlays here
     }
 
-    L.control.layers(baseMaps, overlays, { position: 'topleft' }).addTo(mapRef.current)
+    // L.control.layers(baseMaps, overlays, { position: 'topleft' }).addTo(mapRef.current)
 
     searchControl.on('results', data => {
       results.clearLayers()
@@ -196,9 +196,11 @@ const App = () => {
         <p>Radius Slider</p>
         <Slider ref={sliderRef} min={1} max={10} defaultValue={1} handle={handle} onAfterChange={sliderUpdate} />
       </div>
+      {/* <div className="overlay" /> */}
       <Map
         center={position}
         maxBounds={bounds}
+        maxBoundsViscosity={1}
         zoomControl={false}
         minZoom={2}
         maxZoom={19}
