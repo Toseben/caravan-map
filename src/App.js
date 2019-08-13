@@ -53,7 +53,6 @@ const App = () => {
 
   const [position, setPosition] = useState([0, 0])
   const [radius, setRadius] = useState(1000)
-  const [zoom, setZoom] = useState(2)
 
   useEffect(() => {
     overlay.current = document.querySelector('.loading-overlay')
@@ -79,6 +78,16 @@ const App = () => {
     }, 250)
   }
 
+  const onMapClick = e => {
+    setRadius(1000)
+    sliderRef.current.state.value = 1
+    setPosition([e.latlng.lat, e.latlng.lng])
+
+    setTimeout(() => {
+      mapRef.current.setZoom(15)
+    }, 250)
+  }
+
   useEffect(() => {
     mapRef.current = leafletMap.current.leafletElement
   }, [leafletMap.current])
@@ -101,7 +110,10 @@ const App = () => {
       }
     }
 
+    mapRef.current.doubleClickZoom.disable() 
+
     mapRef.current.on('zoomend', setIconSize.bind(this)) 
+    mapRef.current.on('dblclick', onMapClick)
 
     const lc = L.control.locate(options).addTo(mapRef.current)
     mapRef.current.on('locationfound', onLocationFound)
@@ -190,7 +202,7 @@ const App = () => {
         zoomControl={false}
         minZoom={2}
         maxZoom={19}
-        zoom={zoom}
+        zoom={mapRef.current ? mapRef.current.getZoom() : 2}
         style={style}
         ref={leafletMap}
       >

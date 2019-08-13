@@ -1,6 +1,6 @@
 const React = require('react')
 const { useRef, useState, useEffect, useMemo } = React
-const { GeoJSON } = require('react-leaflet')
+const { GeoJSON, Circle } = require('react-leaflet')
 const query_overpass = require('query-overpass')
 const L = require('leaflet')
 
@@ -98,15 +98,18 @@ const Parking = ({ ...props }) => {
   }
 
   return geoJSON ? (
-    <GeoJSON
-      key={Math.random()}
-      data={geoJSON}
-      weight={2}
-      color="#267FCA"
-      fillColor="#267FCA"
-      onEachFeature={onEachFeature}
-      pointToLayer={campingMarker}
-    />
+    <div>
+      <GeoJSON
+        key={Math.random()}
+        data={geoJSON}
+        weight={2}
+        color="#267FCA"
+        fillColor="#267FCA"
+        onEachFeature={onEachFeature}
+        pointToLayer={campingMarker}
+      />
+      <Circle center={{ lat: props.center[0], lng: props.center[1] }} fillColor="#267FCA" radius={props.radius} />
+    </div>
   ) : null
 }
 
