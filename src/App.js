@@ -182,13 +182,23 @@ const App = () => {
   return (
     <div>
       <div className="loading-overlay">
-        <p>Loading Results...</p>
+        <div className="spinner" />
+        <p>Loading Results</p>
       </div>
       <div style={wrapperStyle}>
         <p>Radius Slider</p>
         <Slider ref={sliderRef} min={1} max={10} defaultValue={1} handle={handle} onAfterChange={sliderUpdate} />
       </div>
-      <Map center={position} maxBounds={bounds} zoomControl={false} minZoom={2} maxZoom={19} zoom={zoom} style={style} ref={leafletMap}>
+      <Map
+        center={position}
+        maxBounds={bounds}
+        zoomControl={false}
+        minZoom={2}
+        maxZoom={19}
+        zoom={zoom}
+        style={style}
+        ref={leafletMap}
+      >
         <ZoomControl position="topright" />
         <Parking center={position} radius={radius} />
       </Map>
