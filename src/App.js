@@ -57,6 +57,7 @@ const App = () => {
   const mapRef = useRef()
   const overlay = useRef()
   const sliderRef = useRef()
+  const amenityRef = useRef('parking')
 
   const [position, setPosition] = useState([0, 0])
   const [radius, setRadius] = useState(1000)
@@ -78,6 +79,10 @@ const App = () => {
   useEffect(() => {
     overlay.current = document.querySelector('.loading-overlay')
   }, [])
+
+  useEffect(() => {
+    amenityRef.current = amenity
+  }, [amenity])
 
   const { style, bounds } = useMemo(() => {
     const style = {
@@ -113,6 +118,10 @@ const App = () => {
     mapRef.current = leafletMap.current.leafletElement
   }, [leafletMap.current])
 
+  const scaleIcons = e => {
+    if (amenityRef.current === 'parking') setIconSize(e)
+  }
+
   useEffect(() => {
     const searchControl = new ELG.Geosearch().addTo(mapRef.current)
     const results = new L.LayerGroup().addTo(mapRef.current)
@@ -133,7 +142,7 @@ const App = () => {
 
     mapRef.current.doubleClickZoom.disable() 
 
-    mapRef.current.on('zoomend', setIconSize.bind(this)) 
+    mapRef.current.on('zoomend', scaleIcons.bind(this)) 
     mapRef.current.on('dblclick', onMapClick)
 
     const lc = L.control.locate(options).addTo(mapRef.current)

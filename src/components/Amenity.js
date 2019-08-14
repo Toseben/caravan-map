@@ -19,8 +19,9 @@ const Amenity = ({ ...props }) => {
 
   const myIcon = useMemo(() => {
     const zoom = props.map ? props.map.getZoom() : 0
-    const x = Math.max(zoom - 12, 0) * 6
-    const y = Math.max(zoom - 12, 0) * 6
+    let x = Math.max(zoom - 12, 0) * 6
+    let y = Math.max(zoom - 12, 0) * 6
+    if (props.amenity !== 'parking') x = y = 32
 
     const icon = L.icon({
       iconUrl: './assets/circle.png',
