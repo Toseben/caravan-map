@@ -9,7 +9,7 @@ const capitalize = s => {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-const Parking = ({ ...props }) => {
+const Amenity = ({ ...props }) => {
   const [geoJSON, setGeoJSON] = useState(undefined)
   const prevState = useRef()
 
@@ -39,23 +39,24 @@ const Parking = ({ ...props }) => {
 
   useEffect(() => {
     let shouldUpdate = false
+    if (prevState.current.amenity !== props.amenity) shouldUpdate = true
     if (prevState.current.center !== props.center) shouldUpdate = true
     if (prevState.current.radius !== props.radius) shouldUpdate = true
     if (shouldUpdate) {
       overlay.style.opacity = 1
-      updateParkingLocations()
+      updateAmenityLocations()
     }
     prevState.current = props
   }, [props])
 
-  const updateParkingLocations = () => {
-    const { center, radius } = props
+  const updateAmenityLocations = () => {
+    const { amenity, center, radius } = props
 
     const query = `[out:json];
     (
-      node[amenity=parking](around:${radius}, ${center[0]}, ${center[1]});\
-      way[amenity=parking](around:${radius}, ${center[0]}, ${center[1]});\
-      relation[amenity=parking](around:${radius}, ${center[0]}, ${center[1]});
+      node[amenity=${amenity}](around:${radius}, ${center[0]}, ${center[1]});\
+      way[amenity=${amenity}](around:${radius}, ${center[0]}, ${center[1]});\
+      relation[amenity=${amenity}](around:${radius}, ${center[0]}, ${center[1]});
     );\
     out body;>;out skel qt;`
 
@@ -125,4 +126,4 @@ const Parking = ({ ...props }) => {
   ) : null
 }
 
-module.exports = Parking
+module.exports = Amenity

@@ -4,13 +4,18 @@ const { useRef, useState, useEffect, useMemo } = React
 const L = require('leaflet')
 import * as ELG from 'esri-leaflet-geocoder'
 const { Map, ZoomControl } = require('react-leaflet')
-const Parking = require('./Parking')
+const Amenity = require('./components/Amenity')
 require('leaflet.locatecontrol')
 
 require('rc-slider/assets/index.css')
 require('rc-tooltip/assets/bootstrap.css')
 import Tooltip from 'rc-tooltip'
 import Slider from 'rc-slider'
+
+import Dropdown from 'rc-dropdown'
+import Menu, { Item as MenuItem, Divider } from 'rc-menu'
+import 'rc-dropdown/assets/index.css'
+
 require('./App.scss')
 
 const { setIconSize } = require('./utils/helperFuncs')
@@ -26,13 +31,15 @@ const handle = props => {
 }
 
 const wrapperStyle = {
-  borderRadius: 2,
-  width: 200,
-  margin: 12,
-  padding: 20,
+  borderRadius: 4,
+  width: 150,
+  margin: 10,
+  padding: '0 20px',
+  paddingBottom: 10,
   position: 'absolute',
   zIndex: 100000,
-  background: 'white'
+  background: 'white',
+  border: '2px solid rgba(0,0,0,0.2)'
 }
 
 // var osm = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"),
@@ -53,6 +60,20 @@ const App = () => {
 
   const [position, setPosition] = useState([0, 0])
   const [radius, setRadius] = useState(1000)
+  const [amenity, setAmenity] = useState('parking')
+
+  const onSelect = ({ key }) => {
+    setAmenity(key)
+  }
+
+  const menu = (
+    <Menu onSelect={onSelect}>
+      <MenuItem key="parking">Parking</MenuItem>
+      <MenuItem key="toilets">Toilets</MenuItem>
+      <MenuItem key="drinking_water">Water</MenuItem>
+      <MenuItem key="shower">Shower</MenuItem>
+    </Menu>
+  )
 
   useEffect(() => {
     overlay.current = document.querySelector('.loading-overlay')
@@ -196,7 +217,11 @@ const App = () => {
         <p>Radius Slider</p>
         <Slider ref={sliderRef} min={1} max={10} defaultValue={1} handle={handle} onAfterChange={sliderUpdate} />
       </div>
-      {/* <div className="overlay" /> */}
+
+      <Dropdown className="amenity-dropdown" trigger={['click']} overlay={menu} animation="slide-up">
+        <button style={{ width: 100 }}>Search for...</button>
+      </Dropdown>
+
       <Map
         center={position}
         maxBounds={bounds}
@@ -209,7 +234,7 @@ const App = () => {
         ref={leafletMap}
       >
         <ZoomControl position="topright" />
-        <Parking center={position} radius={radius} map={mapRef.current} />
+        <Amenity center={position} amenity={amenity} radius={radius} map={mapRef.current} />
       </Map>
     </div>
   )

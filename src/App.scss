@@ -1,5 +1,7 @@
 body {
-  margin: 0px;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
 }
 
 #map {
@@ -115,4 +117,11 @@ body {
 .leaflet-marker-icon {
   mix-blend-mode: color;
   // filter: hue-rotate(90deg);
+}
+
+.amenity-dropdown {
+  position: absolute;
+  z-index: 1000;
+  top: 100px;
+  margin-left: 10px;
 }
